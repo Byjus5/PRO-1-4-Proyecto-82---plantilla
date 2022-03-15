@@ -37,8 +37,8 @@ export default class RideScreen extends Component {
         const { status } = await Permissions.askAsync(Permissions.CAMERA);
 
         this.setState({
-            /*status === "granted" is true when user has granted permission
-                status === "granted" is false when user has not granted the permission
+            /*status === "granted" es true cuando el usuario ha dado permiso
+                status === "granted" es false cuando el usuario no ha dado permiso
               */
             hasCameraPermissions: status === "granted",
             domState: "scanner",
@@ -63,46 +63,46 @@ export default class RideScreen extends Component {
 
         if (!transactionType) {
             this.setState({ bikeId: "" });
-            Alert.alert("Kindly enter/scan valid bike id");
+            Alert.alert("Por favor ingresa/escanea un id de bicicleta válido");
         } else if (transactionType === "under_maintenance") {
             this.setState({
                 bikeId: ""
             });
         } else if (transactionType === "rented") {
-            // Check user availability for start ride 
+            // Revisa la disponibilidad para iniciar el viaje 
             var isEligible =                    ;
 
             if (isEligible) {
                 var { bikeType, userName } = this.state;
                 this.assignBike(bikeId, userId, bikeType, userName);
                 Alert.alert(
-                    "You have rented the bike for next 1 hour. Enjoy your ride!!!"
+                    "Has rentado la bicicleta por 1 hora. ¡Disfruta tu viaje!"
                 );
                 this.setState({
                     bikeAssigned: true
                 });
 
-                // For Android users only
+                // Solo para usuarios Android
                 // ToastAndroid.show(
-                //   "You have rented the bike for next 1 hour. Enjoy your ride!!",
+                //   "Has rentado la bicicleta por 1 hora. ¡Disfruta tu viaje!",
                 //   ToastAndroid.SHORT
                 // );
             }
         } else {
-            // Check user availability for end ride 
+            // Revisa la disponibilidad para finalizar el viaje
             var isEligible =            ;
 
             if (isEligible) {
                 var { bikeType, userName } = this.state;
                 this.returnBike(bikeId, userId, bikeType, userName);
-                Alert.alert("We hope you enjoyed your ride");
+                Alert.alert("Esperamos que hayas disfrutado tu viaje");
                 this.setState({
                     bikeAssigned: false
                 });
 
-                // For Android users only
+                // Solo para usuarios Android
                 // ToastAndroid.show(
-                //   "We hope you enjoyed your ride",
+                //   "Esperamos que hayas disfrutado tu viaje",
                 //   ToastAndroid.SHORT
                 // );
             }
@@ -111,7 +111,7 @@ export default class RideScreen extends Component {
 
     getBikeDetails = bikeId => {
         bikeId = bikeId.trim();
-        db.collection("bicycles")
+        db.collection("bicicletas")
             .where("id", "==", bikeId)
             .get()
             .then(snapshot => {
@@ -124,7 +124,7 @@ export default class RideScreen extends Component {
     };
 
     getUserDetails = userId => {
-        db.collection("users")
+        db.collection("usuarios")
             .where("id", "==", userId)
             .get()
             .then(snapshot => {
@@ -145,7 +145,7 @@ export default class RideScreen extends Component {
 
     checkBikeAvailability = async bikeId => {
         const bikeRef = await db
-            .collection("bicycles")
+            .collection("bicicletas")
             .where("id", "==", bikeId)
             .get();
 
@@ -155,7 +155,7 @@ export default class RideScreen extends Component {
         } else {
             bikeRef.docs.map(doc => {
                 if (!doc.data().under_maintenance) {
-                    //if the bike is available then transaction type will be 'rented' otherwise it will be 'return'
+                    //si la bicilceta está disponible entonces el tipo de transacción será "rented" de lo contrario será "regresar" 
 
                     transactionType = transactionType = doc.data().is_bike_available ?
                         "rented" : "return";
@@ -173,7 +173,7 @@ export default class RideScreen extends Component {
 
     checkUserEligibilityForStartRide = async userId => {
         const userRef = await db
-            .collection("users")
+            .collection("usuarios")
             .where("id", "==", userId)
             .get();
         var isUserEligible = false;
@@ -181,21 +181,21 @@ export default class RideScreen extends Component {
             this.setState({
                 bikeId: ""
             });
-            // Check and update user eligibility value
-            // whether it should be 'true' or 'false'
+            // Revisa y actualiza el valor de elegibilidad del usuario
+            // ya sea que deba ser 'true' o 'false'
             isUserEligible =         ;
-            Alert.alert("Invalid user id");
+            Alert.alert("ID de usuario inválido");
         } else {
             userRef.docs.map(doc => {
                 if (!doc.data().bike_assigned) {
-                    // Check and update user eligibility value
-                    // whether it should be 'true' or 'false'
+                    // Revisa y actualiza el valor de elegibilidad del usuario
+            // ya sea que deba ser 'true' o 'false''
                     isUserEligible =      ;
                 } else {
-                    // Check and update user eligibility value
-                    // whether it should be 'true' or 'false'
+                    // Revisa y actualiza el valor de elegibilidad del usuario
+            // ya sea que deba ser 'true' o 'false'
                     isUserEligible =      ;
-                    Alert.alert("End the current ride to rent another bike.");
+                    Alert.alert("Finaliza el viaje actual para rentar otra bicicleta.");
                     this.setState({
                         bikeId: ""
                     });
@@ -208,31 +208,31 @@ export default class RideScreen extends Component {
 
     checkUserEligibilityForEndRide = async (bikeId, userId) => {
         const transactionRef = await db
-            .collection("transactions")
+            .collection("transacciones")
             .where("bike_id", "==", bikeId)
             .limit(1)
             .get();
         var isUserEligible = "";
         transactionRef.docs.map(doc => {
             var lastBikeTransaction = doc.data();
-            // Check if 'lastBikeTransaction.userid' equals 'userId'. 
+            // Revisa si 'lastBikeTransaction.userid' es igual a 'userId'. 
             if (             ) {
                 isUserEligible = true;
             } else {
                 isUserEligible = false;
-                Alert.alert("This bike is rented by another user");
+                Alert.alert("Esta bicicleta está rentada por otro usuario");
                 this.setState({
                     bikeId: ""
                 });
             }
         });
-        // Return the user's eligibility status
+        // Devuelve la elegibilidad del estado del usuario 
         return                 ;
     };
 
     assignBike = async (bikeId, userId, bikeType, userName) => {
-        //add a transaction
-        db.collection("transactions").add({
+        //agrega una transacción
+        db.collection("transacciones").add({
             user_id: userId,
             user_name: userName,
             bike_id: bikeId,
@@ -240,28 +240,28 @@ export default class RideScreen extends Component {
             date: firebase.firestore.Timestamp.now().toDate(),
             transaction_type: "rented"
         });
-        //change bike status
-        db.collection("bicycles")
+        //cambia el estatus de la bicicleta
+        db.collection("bicicletas")
             .doc(bikeId)
             .update({
                 is_bike_available: false
             });
-        //change value  of bike assigned for user
-        db.collection("users")
+        //cambia el valor de la bicicleta asignada por el usuario
+        db.collection("usuarios")
             .doc(userId)
             .update({
                 bike_assigned: true
             });
 
-        // Updating local state
+        // Actualizar estado actual
         this.setState({
             bikeId: ""
         });
     };
 
     returnBike = async (bikeId, userId, bikeType, userName) => {
-        //add a transaction
-        db.collection("transactions").add({
+        //Agrega una transacción
+        db.collection("transacciones").add({
             user_id: userId,
             user_name: userName,
             bike_id: bikeId,
@@ -269,20 +269,20 @@ export default class RideScreen extends Component {
             date: firebase.firestore.Timestamp.now().toDate(),
             transaction_type: "return"
         });
-        //change bike status
-        db.collection("bicycles")
+        //cambia el estatus de la bicicleta
+        db.collection("bicicletas")
             .doc(bikeId)
             .update({
                 is_bike_available: true
             });
-        //change value  of bike assigned for user
-        db.collection("users")
+        //Cambia el valor de la bicicleta asignada por el usuario
+        db.collection("usuarios")
             .doc(userId)
             .update({
                 bike_assigned: false
             });
 
-        // Updating local state
+        // Actualiza el estado local
         this.setState({
             bikeId: ""
         });
@@ -302,15 +302,15 @@ export default class RideScreen extends Component {
             <KeyboardAvoidingView behavior="padding" style={styles.container}>
                 <View style={styles.upperContainer}>
                     <Image source={appIcon} style={styles.appIcon} />
-                    <Text style={styles.title}>e-ride</Text>
-                    <Text style={styles.subtitle}>A Eco-Friendly Ride</Text>
+                    <Text style={styles.title}>Travesía digital</Text>
+                    <Text style={styles.subtitle}>Un viaje eco-friendly</Text>
                 </View>
                 <View style={styles.lowerContainer}>
                     <View style={styles.textinputContainer}>
                         <TextInput
                             style={[styles.textinput, { width: "82%" }]}
                             onChangeText={text => this.setState({ userId: text })}
-                            placeholder={"User Id"}
+                            placeholder={"ID del usuario"}
                             placeholderTextColor={"#FFFFFF"}
                             value={userId}
                         />
@@ -319,7 +319,7 @@ export default class RideScreen extends Component {
                         <TextInput
                             style={styles.textinput}
                             onChangeText={text => this.setState({ bikeId: text })}
-                            placeholder={"Bicycle Id"}
+                            placeholder={"ID de la bicicleta"}
                             placeholderTextColor={"#FFFFFF"}
                             value={bikeId}
                             autoFocus
@@ -328,7 +328,7 @@ export default class RideScreen extends Component {
                             style={styles.scanbutton}
                             onPress={() => this.getCameraPermissions()}
                         >
-                            <Text style={styles.scanbuttonText}>Scan</Text>
+                            <Text style={styles.scanbuttonText}>Escanear</Text>
                         </TouchableOpacity>
                     </View>
 
@@ -337,7 +337,7 @@ export default class RideScreen extends Component {
                         onPress={this.handleTransaction}
                     >
                         <Text style={styles.buttonText}>
-                            {bikeAssigned ? "End Ride" : "Unlock"}
+                            {bikeAssigned ? "Finalizar el viaje" : "Desbloquear"}
                         </Text>
                     </TouchableOpacity>
                 </View>
